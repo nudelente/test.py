@@ -112,8 +112,7 @@ def process_pdf_files(pdf_dir):
                 os.rename(file_path, target_path)
                 print(f"No date found for {filename}. Renamed to: {new_filename}")
 
-
-
+#hallo
 # Beispielaufruf
 pdf_directory = "."
 process_pdf_files(pdf_directory)

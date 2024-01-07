@@ -30,6 +30,7 @@ def extract_invoice_number(file_path):
     print("No invoice number found.")
     return None
 
+
 def extract_date_from_pdf(file_path, language):
     with open(file_path, 'rb') as pdf_file:
         pdf_reader = PyPDF2.PdfReader(pdf_file)
@@ -48,35 +49,35 @@ def extract_date_from_pdf(file_path, language):
     }
     keyword = date_keywords[language]
     for line in lines:
+        #print(f"Debugging: {line}")  # Add this line to print the content of each line
         if keyword in line:
-            words = line.split()
-            if len(words) >= 3:
-                day = words[-3]
-                month = words[-2]
-                year = words[-1]
-
-                print(f"Debugging: day={day}, month={month}, year={year}")
+            # Adjust the regular expression for the new date format
+            match = re.search(r'(\d{1,2}) ([a-zA-Z]+) (\d{4})', line)
+            if match:
+                day, month, year = match.groups()
 
                 month_dict = {
-                    "Januar": "01", "Februar": "02", "März": "03", "April": "04", "Mai": "05", "Juni": "06",
-                    "Juli": "07", "August": "08", "September": "09", "Oktober": "10", "November": "11", "Dezember": "12",
-                    "gennaio": "01", "febbraio": "02", "marzo": "03", "aprile": "04", "maggio": "05", "giugno": "06",
-                    "luglio": "07", "agosto": "08", "settembre": "09", "ottobre": "10", "novembre": "11", "dicembre": "12",
                     "enero": "01", "febrero": "02", "marzo": "03", "abril": "04", "mayo": "05", "junio": "06",
                     "julio": "07", "agosto": "08", "septiembre": "09", "octubre": "10", "noviembre": "11", "diciembre": "12",
+                    "gennaio": "01", "febbraio": "02", "marzo": "03", "aprile": "04", "maggio": "05", "giugno": "06",
+                    "luglio": "07", "agosto": "08", "settembre": "09", "ottobre": "10", "novembre": "11", "dicembre": "12",
                     "janvier": "01", "février": "02", "mars": "03", "avril": "04", "mai": "05", "juin": "06",
                     "juillet": "07", "août": "08", "septembre": "09", "octobre": "10", "novembre": "11", "décembre": "12",
                     "January": "01", "February": "02", "March": "03", "April": "04", "May": "05", "June": "06",
                     "July": "07", "August": "08", "September": "09", "October": "10", "November": "11", "December": "12"
                 }
 
-                formatted_date = f"{month_dict[month]}-{day}-{year}"
+                formatted_date = f"{month_dict.get(month.lower(), '01')}-{day}-{year}"
                 print(f"Found date: {formatted_date}")
                 return formatted_date
 
     print(f"Date keyword not found for language {language}")
 
     return None
+
+
+
+
 
 
 def process_pdf_files(pdf_dir):

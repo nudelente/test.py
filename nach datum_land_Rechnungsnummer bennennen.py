@@ -30,7 +30,6 @@ def extract_invoice_number(file_path):
     print("No invoice number found.")
     return None
 
-
 def extract_date_from_pdf(file_path, language):
     with open(file_path, 'rb') as pdf_file:
         pdf_reader = PyPDF2.PdfReader(pdf_file)
@@ -49,25 +48,29 @@ def extract_date_from_pdf(file_path, language):
     }
     keyword = date_keywords[language]
     for line in lines:
-        #print(f"Debugging: {line}")  # Add this line to print the content of each line
         if keyword in line:
-            # Adjust the regular expression for the new date format
-            match = re.search(r'(\d{1,2}) ([a-zA-Z]+) (\d{4})', line)
-            if match:
-                day, month, year = match.groups()
+            words = line.split()
+            if len(words) >= 3:
+                day = words[-3]
+                month = words[-2]
+                year = words[-1]
+
+                print(f"Debugging: day={day}, month={month}, year={year}")
 
                 month_dict = {
-                    "enero": "01", "febrero": "02", "marzo": "03", "abril": "04", "mayo": "05", "junio": "06",
-                    "julio": "07", "agosto": "08", "septiembre": "09", "octubre": "10", "noviembre": "11", "diciembre": "12",
+                    "Januar": "01", "Februar": "02", "März": "03", "April": "04", "Mai": "05", "Juni": "06",
+                    "Juli": "07", "August": "08", "September": "09", "Oktober": "10", "November": "11", "Dezember": "12",
                     "gennaio": "01", "febbraio": "02", "marzo": "03", "aprile": "04", "maggio": "05", "giugno": "06",
                     "luglio": "07", "agosto": "08", "settembre": "09", "ottobre": "10", "novembre": "11", "dicembre": "12",
+                    "enero": "01", "febrero": "02", "marzo": "03", "abril": "04", "mayo": "05", "junio": "06",
+                    "julio": "07", "agosto": "08", "septiembre": "09", "octubre": "10", "noviembre": "11", "diciembre": "12",
                     "janvier": "01", "février": "02", "mars": "03", "avril": "04", "mai": "05", "juin": "06",
                     "juillet": "07", "août": "08", "septembre": "09", "octobre": "10", "novembre": "11", "décembre": "12",
                     "January": "01", "February": "02", "March": "03", "April": "04", "May": "05", "June": "06",
                     "July": "07", "August": "08", "September": "09", "October": "10", "November": "11", "December": "12"
                 }
 
-                formatted_date = f"{month_dict.get(month.lower(), '01')}-{day}-{year}"
+                formatted_date = f"{month_dict[month]}-{day}-{year}"
                 print(f"Found date: {formatted_date}")
                 return formatted_date
 
@@ -76,14 +79,15 @@ def extract_date_from_pdf(file_path, language):
     return None
 
 
-
-
-
-
 def process_pdf_files(pdf_dir):
     for filename in os.listdir(pdf_dir):
         if filename.endswith(".pdf"):
             file_path = os.path.join(pdf_dir, filename)
+
+            # Check if the file is already correctly named
+            if re.match(r'\d{2}-\d{2}-\d{4}_[A-Z]{2}_[A-Z0-9]+\.pdf', filename):
+                print(f"File already correctly named: {filename}")
+                continue
 
             # Value 1: Rechnungsnummer
             invoice_number = extract_invoice_number(file_path)
@@ -99,9 +103,10 @@ def process_pdf_files(pdf_dir):
             if new_filename:
                 # Überprüfen, ob die Datei bereits existiert
                 target_path = os.path.join(pdf_dir, new_filename)
+
+                # Handle the case where the target file already exists
                 counter = 1
                 while os.path.exists(target_path):
-                    # Füge einen Zähler hinzu, um einen eindeutigen Dateinamen zu generieren
                     new_filename = f"{formatted_date}_{language}_{invoice_number}_{counter}.pdf"
                     target_path = os.path.join(pdf_dir, new_filename)
                     counter += 1
@@ -111,22 +116,22 @@ def process_pdf_files(pdf_dir):
                 print(f"Renamed: {filename} -> {new_filename}")
             else:
                 # Wenn kein Datum für die deutsche Sprache gefunden wurde, benutze einen anderen Dateinamen
-                new_filename = f"no_date_DE_{invoice_number}_1.pdf"
+                new_filename = f"no_date_DE_{invoice_number}.pdf"
                 target_path = os.path.join(pdf_dir, new_filename)
-                counter = 2  # Initialize counter
+
+                # Handle the case where the target file already exists
+                counter = 1
                 while os.path.exists(target_path):
-                    # Füge einen Zähler hinzu, um einen eindeutigen Dateinamen zu generieren
                     new_filename = f"no_date_DE_{invoice_number}_{counter}.pdf"
                     target_path = os.path.join(pdf_dir, new_filename)
                     counter += 1
 
-                # Umbenenne die Datei
                 os.rename(file_path, target_path)
                 print(f"No date found for {filename}. Renamed to: {new_filename}")
 
-
-
-#hallo
 # Beispielaufruf
 pdf_directory = "."
 process_pdf_files(pdf_directory)
+
+
+

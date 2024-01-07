@@ -46,7 +46,11 @@ def extract_date_from_pdf(file_path, language):
         "FR": "Date de la facture/Date de la livraison",
         "UK": "Invoice date / Delivery date"
     }
-    keyword = date_keywords[language]
+    keyword = date_keywords.get(language, None)
+    if keyword is None:
+        print(f"Date keyword not found for language {language}")
+        return None
+
     for line in lines:
         if keyword in line:
             words = line.split()
@@ -70,13 +74,17 @@ def extract_date_from_pdf(file_path, language):
                     "July": "07", "August": "08", "September": "09", "October": "10", "November": "11", "December": "12"
                 }
 
-                formatted_date = f"{month_dict[month]}-{day}-{year}"
-                print(f"Found date: {formatted_date}")
-                return formatted_date
+                try:
+                    formatted_date = f"{month_dict[month]}-{day}-{year}"
+                    print(f"Found date: {formatted_date}")
+                    return formatted_date
+                except KeyError as e:
+                    print(f"KeyError: {e}")
+                    return None
 
     print(f"Date keyword not found for language {language}")
-
     return None
+
 
 
 def process_pdf_files(pdf_dir):

@@ -55,6 +55,8 @@ def extract_date_from_pdf(file_path, language):
                 month = words[-2]
                 year = words[-1]
 
+                print(f"Debugging: day={day}, month={month}, year={year}")
+
                 month_dict = {
                     "Januar": "01", "Februar": "02", "März": "03", "April": "04", "Mai": "05", "Juni": "06",
                     "Juli": "07", "August": "08", "September": "09", "Oktober": "10", "November": "11", "Dezember": "12",
@@ -75,6 +77,7 @@ def extract_date_from_pdf(file_path, language):
     print(f"Date keyword not found for language {language}")
 
     return None
+
 
 def process_pdf_files(pdf_dir):
     for filename in os.listdir(pdf_dir):
@@ -107,10 +110,20 @@ def process_pdf_files(pdf_dir):
                 print(f"Renamed: {filename} -> {new_filename}")
             else:
                 # Wenn kein Datum für die deutsche Sprache gefunden wurde, benutze einen anderen Dateinamen
-                new_filename = f"no_date_DE_{invoice_number}.pdf"
+                new_filename = f"no_date_DE_{invoice_number}_1.pdf"
                 target_path = os.path.join(pdf_dir, new_filename)
+                counter = 2  # Initialize counter
+                while os.path.exists(target_path):
+                    # Füge einen Zähler hinzu, um einen eindeutigen Dateinamen zu generieren
+                    new_filename = f"no_date_DE_{invoice_number}_{counter}.pdf"
+                    target_path = os.path.join(pdf_dir, new_filename)
+                    counter += 1
+
+                # Umbenenne die Datei
                 os.rename(file_path, target_path)
                 print(f"No date found for {filename}. Renamed to: {new_filename}")
+
+
 
 #hallo
 # Beispielaufruf

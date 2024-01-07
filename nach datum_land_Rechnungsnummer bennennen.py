@@ -104,30 +104,35 @@ def process_pdf_files(pdf_dir):
                 # Überprüfen, ob die Datei bereits existiert
                 target_path = os.path.join(pdf_dir, new_filename)
 
-                # Handle the case where the target file already exists
-                counter = 1
-                while os.path.exists(target_path):
-                    new_filename = f"{formatted_date}_{language}_{invoice_number}_{counter}.pdf"
-                    target_path = os.path.join(pdf_dir, new_filename)
-                    counter += 1
+                # Check if the target file already exists and if it has the correct name
+                if not os.path.exists(target_path):
+                    # Handle the case where the target file already exists
+                    counter = 1
+                    while os.path.exists(target_path):
+                        new_filename = f"{formatted_date}_{language}_{invoice_number}_{counter}.pdf"
+                        target_path = os.path.join(pdf_dir, new_filename)
+                        counter += 1
 
-                # Umbenenne die Datei
-                os.rename(file_path, target_path)
-                print(f"Renamed: {filename} -> {new_filename}")
+                    # Umbenenne die Datei
+                    os.rename(file_path, target_path)
+                    print(f"Renamed: {filename} -> {new_filename}")
             else:
                 # Wenn kein Datum für die deutsche Sprache gefunden wurde, benutze einen anderen Dateinamen
                 new_filename = f"no_date_DE_{invoice_number}.pdf"
                 target_path = os.path.join(pdf_dir, new_filename)
 
-                # Handle the case where the target file already exists
-                counter = 1
-                while os.path.exists(target_path):
-                    new_filename = f"no_date_DE_{invoice_number}_{counter}.pdf"
-                    target_path = os.path.join(pdf_dir, new_filename)
-                    counter += 1
+                # Check if the target file already exists and if it has the correct name
+                if not os.path.exists(target_path):
+                    # Handle the case where the target file already exists
+                    counter = 1
+                    while os.path.exists(target_path):
+                        new_filename = f"no_date_DE_{invoice_number}_{counter}.pdf"
+                        target_path = os.path.join(pdf_dir, new_filename)
+                        counter += 1
 
-                os.rename(file_path, target_path)
-                print(f"No date found for {filename}. Renamed to: {new_filename}")
+                    os.rename(file_path, target_path)
+                    print(f"No date found for {filename}. Renamed to: {new_filename}")
+
 
 # Beispielaufruf
 pdf_directory = "."
